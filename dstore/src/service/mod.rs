@@ -28,10 +28,11 @@ impl StoreServer {
     }
 
     pub fn get(&self, get: Get) -> Result<CommandResponse, KvError> {
+        let value = self.data_store.get(&get.key)?;
         Ok(CommandResponse {
             status: 0,
             message: "OK".to_string(),
-            pairs: vec![],
+            pairs: vec![value],
         })
     }
 

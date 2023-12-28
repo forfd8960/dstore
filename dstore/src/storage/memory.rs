@@ -21,13 +21,13 @@ impl MemTable {
 }
 
 impl Storage for MemTable {
-    fn get(&self, key: &str) -> Result<Option<pb::Kv>, KvError> {
+    fn get(&self, key: &str) -> Result<pb::Kv, KvError> {
         let result = self.simple_k_v.get(key);
         match result {
-            Some(kv) => Ok(Some(pb::Kv {
+            Some(kv) => Ok(pb::Kv {
                 key: kv.key().to_string(),
                 value: kv.value().to_string(),
-            })),
+            }),
             None => Err(KvError::NotFound(key.to_string())),
         }
     }
