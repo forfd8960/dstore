@@ -1,15 +1,9 @@
-mod errors;
-mod handler;
-mod pb;
-mod service;
-mod storage;
-
 use anyhow::Result;
 use bytes::Bytes;
 use prost::Message;
 use tokio::{io::AsyncWriteExt, net::TcpListener};
 
-use crate::pb::pb as dspb;
+use dstore::pb::pb as dspb;
 
 #[tokio::main]
 async fn main() -> Result<()> {
