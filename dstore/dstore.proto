@@ -2,6 +2,31 @@ syntax = "proto3";
 
 package pb;
 
+message CommondRequest {
+  oneof request_data {
+    Get get = 1;
+    Set set = 2;
+    HGet hget = 3;
+    HSet hset = 4;
+  }
+}
+
+message Get { string key = 1; }
+
+message Set { KV kv = 1; }
+
+message HSet { HMap data = 1; }
+message HGet {
+  string key = 1;
+  string field = 2;
+}
+
+message CommandResponse {
+  uint32 status = 1;
+  string message = 2;
+  repeated KV pairs = 3;
+}
+
 message KV {
   string key = 1;
   string value = 2;
@@ -10,30 +35,4 @@ message KV {
 message HMap {
   string key = 1;
   repeated KV field_values = 2;
-}
-
-message CommonResp {
-  int32 status = 1;
-  string message = 2;
-}
-
-message SetRequest { KV kv = 1; }
-
-message SetResponse { CommonResp resp = 1; }
-
-message GetRequest { KV kv = 1; }
-
-message GetResponse { CommonResp resp = 1; }
-
-message HSetRequest { HMap data = 1; }
-message HSetResponse { CommonResp resp = 1; }
-
-message HGetRequest {
-  string key = 1;
-  string field = 2;
-}
-
-message HGetResponse {
-  string key = 1;
-  KV field_value = 2;
 }

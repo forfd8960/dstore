@@ -1,7 +1,7 @@
 mod errors;
 mod handler;
 mod pb;
-mod server;
+mod service;
 mod storage;
 
 fn main() {

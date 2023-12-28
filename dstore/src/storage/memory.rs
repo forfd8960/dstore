@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use dashmap::DashMap;
 
 use super::Storage;
@@ -28,5 +30,43 @@ impl Storage for MemTable {
             })),
             None => Err(KvError::NotFound(key.to_string())),
         }
+    }
+
+    fn set(&self, key: &str, value: &str) -> Result<Option<pb::Kv>, KvError> {
+        let result = self.simple_k_v.insert(key.to_string(), value.to_string());
+        match result {
+            Some(_) => Ok(Some(pb::Kv {
+                key: key.to_string(),
+                value: value.to_string(),
+            })),
+            None => Err(KvError::NotFound(key.to_string())),
+        }
+    }
+
+    fn hget(&self, key: &str, field: &str) -> Result<Option<pb::Kv>, KvError> {
+        let result = self.data_map.get(key);
+        match result {
+            Some(m) => {
+                let value = m.get(field);
+                match value {
+                    Some(v) => Ok(Some(pb::Kv {
+                        key: key.to_string(),
+                        value: v.to_string(),
+                    })),
+                    None => Err(KvError::NotFound(key.to_string())),
+                }
+            }
+            None => Err(KvError::NotFound(key.to_string())),
+        }
+    }
+
+    fn hset(&self, key: &str, m: HashMap<String, String>) -> Result<i64, KvError> {
+        let d: DashMap<String, String> = DashMap::new();
+        for (k, v) in m.iter() {
+            d.insert(k.to_string(), v.to_string());
+        }
+        let len = d.len();
+        self.data_map.insert(key.to_string(), d);
+        Ok(len as i64)
     }
 }
