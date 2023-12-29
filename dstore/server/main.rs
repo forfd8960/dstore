@@ -21,7 +21,6 @@ async fn main() -> Result<()> {
             let mut buf = [0; 4096];
             match tcp_stream.try_read(&mut buf) {
                 Ok(0) => {}
-
                 Ok(n) => {
                     println!("read {} bytes", n);
                     let data = Bytes::copy_from_slice(&buf[0..n]);

@@ -68,9 +68,8 @@ async fn send_cmd() -> Result<()> {
 }
 
 fn parse_cmd(cmd: String) -> pb::CommondRequest {
+    let args = Vec::from_iter(cmd.split(" "));
     pb::CommondRequest {
-        request_data: Some(pb::commond_request::RequestData::Get(pb::Get {
-            key: "test-key".to_string(),
-        })),
+        request_data: Some(pb::commond_request::RequestData::Get(pb::Get::from(args))),
     }
 }
