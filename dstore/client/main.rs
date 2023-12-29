@@ -51,7 +51,7 @@ async fn send_cmd() -> Result<()> {
 }
 
 fn parse_cmd(cmd: String) -> Result<pb::CommondRequest, CmdError> {
-    let args = Vec::from_iter(cmd.split(" "));
+    let args = Vec::from_iter(cmd.split(" ").filter(|x| x.trim() != "").map(|x| x.trim()));
     if args.len() < 1 {
         return Err(CmdError::InvalidCmdParameter(cmd));
     }
