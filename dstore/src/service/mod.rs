@@ -1,8 +1,8 @@
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 use crate::{
     errors::KvError,
-    pb::pb::{commond_request::RequestData, CommandResponse, Get, HGet, HSet, Set},
+    pb::pb::{commond_request::RequestData, CommandResponse, Get, HGet, HSet, Kv, Set},
     storage::{MemTable, Storage},
 };
 
@@ -37,25 +37,36 @@ impl StoreServer {
     }
 
     pub fn set(&self, set: Set) -> Result<CommandResponse, KvError> {
+        let kv = set.kv.unwrap();
+        let res = self.data_store.set(&kv.key, &kv.value)?;
+
         Ok(CommandResponse {
             status: 0,
             message: "OK".to_string(),
-            pairs: vec![],
+            pairs: vec![res.unwrap()],
         })
     }
 
-    pub fn hget(&self, set: HGet) -> Result<CommandResponse, KvError> {
+    pub fn hget(&self, hget: HGet) -> Result<CommandResponse, KvError> {
+        let res = self.data_store.hget(&hget.key, &hget.field)?;
         Ok(CommandResponse {
             status: 0,
             message: "OK".to_string(),
-            pairs: vec![],
+            pairs: vec![res.unwrap()],
         })
     }
 
-    pub fn hset(&self, set: HSet) -> Result<CommandResponse, KvError> {
+    pub fn hset(&self, hset: HSet) -> Result<CommandResponse, KvError> {
+        let data = hset.data.unwrap();
+        let mut m = HashMap::new();
+        for field_v in data.field_values {
+            m.insert(field_v.key, field_v.value);
+        }
+
+        let res = self.data_store.hset(&data.key, m)?;
         Ok(CommandResponse {
             status: 0,
-            message: "OK".to_string(),
+            message: res.to_string(),
             pairs: vec![],
         })
     }

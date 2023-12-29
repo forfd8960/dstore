@@ -7,7 +7,13 @@ pub enum KvError {
 }
 
 #[derive(Error, Debug, PartialEq)]
-pub enum ParseCmdError {
+pub enum CmdError {
+    #[error("Invalid cmd parameter: {0}")]
+    InvalidCmdParameter(String),
+
+    #[error("Unknown Cmd: {0}")]
+    UnknownCmd(String),
+
     #[error("Invalid get cmd: {0}")]
     InvalidGetCmd(String),
 
