@@ -6,6 +6,7 @@ use super::Storage;
 use crate::errors::KvError;
 use crate::pb::pb;
 
+#[derive(Debug, Clone)]
 pub struct MemTable {
     simple_k_v: DashMap<String, String>,
     data_map: DashMap<String, DashMap<String, String>>,
@@ -53,7 +54,7 @@ impl Storage for MemTable {
                         key: key.to_string(),
                         value: v.to_string(),
                     })),
-                    None => Err(KvError::NotFound(key.to_string())),
+                    None => Err(KvError::NotFound(field.to_string())),
                 }
             }
             None => Err(KvError::NotFound(key.to_string())),
