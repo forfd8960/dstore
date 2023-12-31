@@ -36,7 +36,9 @@ async fn send_cmd() -> Result<()> {
 
                         let mut resp = BytesMut::with_capacity(4096);
                         stream.read_buf(&mut resp).await.unwrap();
-                        println!("read response: {:?}", String::from_utf8(resp.to_vec()));
+
+                        let cmd_resp = pb::CommandResponse::decode(&mut resp);
+                        println!("read response: {:?}", cmd_resp);
                     }
                     Err(e) => {
                         println!("parse cmd err: {}", e);

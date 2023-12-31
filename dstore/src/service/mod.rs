@@ -2,19 +2,25 @@ use std::{collections::HashMap, sync::Arc};
 
 use crate::{
     errors::KvError,
-    pb::pb::{commond_request::RequestData, CommandResponse, Get, HGet, HSet, Kv, Set},
+    pb::pb::{commond_request::RequestData, CommandResponse, Get, HGet, HSet, Set},
     storage::{MemTable, Storage},
 };
 
 pub struct StoreServer {
-    data_store: Arc<dyn Storage>,
+    server_inner: Arc<ServerInner>,
+}
+
+struct ServerInner {
+    data_store: Box<dyn Storage + Send + Sync>,
 }
 
 impl StoreServer {
     pub fn new() -> Self {
-        let memtable = MemTable::new(100);
+        let data_store: Box<dyn Storage + Send + Sync> = Box::new(MemTable::new(100));
         Self {
-            data_store: Arc::new(memtable),
+            server_inner: Arc::new(ServerInner {
+                data_store: data_store,
+            }),
         }
     }
 
@@ -28,7 +34,7 @@ impl StoreServer {
     }
 
     pub fn get(&self, get: Get) -> Result<CommandResponse, KvError> {
-        let value = self.data_store.get(&get.key)?;
+        let value = self.server_inner.data_store.get(&get.key)?;
         Ok(CommandResponse {
             status: 0,
             message: "OK".to_string(),
@@ -38,7 +44,7 @@ impl StoreServer {
 
     pub fn set(&self, set: Set) -> Result<CommandResponse, KvError> {
         let kv = set.kv.unwrap();
-        let res = self.data_store.set(&kv.key, &kv.value)?;
+        let res = self.server_inner.data_store.set(&kv.key, &kv.value)?;
 
         Ok(CommandResponse {
             status: 0,
@@ -48,7 +54,7 @@ impl StoreServer {
     }
 
     pub fn hget(&self, hget: HGet) -> Result<CommandResponse, KvError> {
-        let res = self.data_store.hget(&hget.key, &hget.field)?;
+        let res = self.server_inner.data_store.hget(&hget.key, &hget.field)?;
         Ok(CommandResponse {
             status: 0,
             message: "OK".to_string(),
@@ -63,7 +69,7 @@ impl StoreServer {
             m.insert(field_v.key, field_v.value);
         }
 
-        let res = self.data_store.hset(&data.key, m)?;
+        let res = self.server_inner.data_store.hset(&data.key, m)?;
         Ok(CommandResponse {
             status: 0,
             message: res.to_string(),
@@ -75,7 +81,7 @@ impl StoreServer {
 impl Clone for StoreServer {
     fn clone(&self) -> Self {
         Self {
-            data_store: Arc::clone(&self.data_store),
+            server_inner: Arc::clone(&self.server_inner),
         }
     }
 }

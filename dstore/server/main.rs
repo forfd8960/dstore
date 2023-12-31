@@ -3,7 +3,10 @@ use bytes::Bytes;
 use prost::Message;
 use tokio::{io::AsyncWriteExt, net::TcpListener};
 
-use dstore::{pb::pb as dspb, service::StoreServer};
+use dstore::{
+    pb::pb::{self as dspb, CommandResponse},
+    service::StoreServer,
+};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -18,8 +21,7 @@ async fn main() -> Result<()> {
         println!("client: {} connected", addr);
 
         let _ = tcp_stream.readable().await;
-
-        let server = store_server.clone();
+        let server_clone = store_server.clone();
 
         tokio::spawn(async move {
             let mut buf = [0; 4096];
@@ -32,14 +34,21 @@ async fn main() -> Result<()> {
                     match req_data {
                         Ok(req) => {
                             println!("decode cmd: {:?}", req);
-                            let resp = server.dispatch(req.request_data.unwrap());
+
+                            let resp = server_clone.dispatch(req.request_data.unwrap());
                             match resp {
                                 Ok(res) => {
-                                    let _ = tcp_stream.write_all(b"Received data").await;
+                                    let res_bs = res.encode_to_vec();
+                                    let _ = tcp_stream.write_all(res_bs.as_slice()).await;
                                 }
                                 Err(kv_error) => {
+                                    let resp = CommandResponse {
+                                        status: 400,
+                                        message: kv_error.to_string(),
+                                        pairs: vec![],
+                                    };
                                     let _ =
-                                        tcp_stream.write_all(kv_error.to_string().as_bytes()).await;
+                                        tcp_stream.write_all(resp.encode_to_vec().as_slice()).await;
                                 }
                             }
                         }
