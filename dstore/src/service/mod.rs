@@ -30,6 +30,8 @@ impl StoreServer {
             RequestData::Set(set_req) => self.set(set_req),
             RequestData::Hget(hget_req) => self.hget(hget_req),
             RequestData::Hset(hset_req) => self.hset(hset_req),
+            RequestData::Sadd(sadd_req) => todo!(),
+            RequestData::Smembers(smembers_req) => todo!(),
         }
     }
 
