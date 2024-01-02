@@ -70,3 +70,15 @@ impl CmdValidtor for pb::SAdd {
         None
     }
 }
+
+impl CmdValidtor for pb::SMembers {
+    fn validate(cmds: Vec<&str>) -> Option<CmdError> {
+        if cmds.len() != 2 {
+            return Some(CmdError::InvalidHSetCmd(
+                "not enough parameter for SMembers".to_string(),
+            ));
+        }
+
+        None
+    }
+}

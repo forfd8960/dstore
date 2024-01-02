@@ -2,7 +2,7 @@ use anyhow::Result;
 use bytes::BytesMut;
 use dstore::{
     errors::CmdError,
-    pb::{pb, GET_CMD, HGET_CMD, HSET_CMD, SADD_CMD, SET_CMD},
+    pb::{pb, GET_CMD, HGET_CMD, HSET_CMD, SADD_CMD, SET_CMD, SMEMBERS_CMD},
     validator::CmdValidtor,
 };
 use prost::Message;
@@ -107,6 +107,18 @@ fn parse_cmd(cmd: String) -> Result<pb::CommondRequest, CmdError> {
 
             Ok(pb::CommondRequest {
                 request_data: Some(pb::commond_request::RequestData::Sadd(pb::SAdd::from(args))),
+            })
+        }
+        SMEMBERS_CMD => {
+            let res = pb::SMembers::validate(args.clone());
+            if res.is_some() {
+                return Err(res.unwrap());
+            }
+
+            Ok(pb::CommondRequest {
+                request_data: Some(pb::commond_request::RequestData::Smembers(
+                    pb::SMembers::from(args),
+                )),
             })
         }
         _ => Err(CmdError::UnknownCmd(args[0].to_string())),

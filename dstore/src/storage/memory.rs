@@ -62,6 +62,34 @@ impl Storage for MemTable {
         }
         Ok(length as i64)
     }
+
+    // smembers key
+    /*
+    127.0.0.1:6379> smembers set2
+    1) "hello"
+    2) "world"
+    3) "good"
+    4) "morning"
+    5) "happy"
+    6) "new"
+    7) "year"
+    127.0.0.1:6379> SMEMBERS no-set
+    (empty array)
+    */
+    fn smembers(&self, key: &str) -> Result<Vec<String>, KvError> {
+        let mut members = vec![];
+        let result = self.simple_set.get(key);
+        match result {
+            Some(set) => {
+                for v in set.iter() {
+                    members.push(v.clone());
+                }
+            }
+            None => {}
+        }
+
+        Ok(members)
+    }
     fn hget(&self, key: &str, field: &str) -> Result<Option<pb::Kv>, KvError> {
         let result = self.data_map.get(key);
         match result {

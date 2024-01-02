@@ -5,3 +5,4 @@ pub const SET_CMD: &str = "Set";
 pub const HGET_CMD: &str = "HGet";
 pub const HSET_CMD: &str = "HSet";
 pub const SADD_CMD: &str = "SAdd";
+pub const SMEMBERS_CMD: &str = "SMembers";

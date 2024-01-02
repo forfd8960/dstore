@@ -5,7 +5,7 @@ use std::{
 
 use crate::{
     errors::KvError,
-    pb::pb::{commond_request::RequestData, CommandResponse, Get, HGet, HSet, SAdd, Set},
+    pb::pb::{commond_request::RequestData, CommandResponse, Get, HGet, HSet, SAdd, SMembers, Set},
     storage::{MemTable, Storage},
 };
 
@@ -34,7 +34,7 @@ impl StoreServer {
             RequestData::Hget(hget_req) => self.hget(hget_req),
             RequestData::Hset(hset_req) => self.hset(hset_req),
             RequestData::Sadd(sadd_req) => self.sadd(sadd_req),
-            RequestData::Smembers(smembers_req) => todo!(),
+            RequestData::Smembers(smembers_req) => self.smembers(smembers_req),
         }
     }
 
@@ -90,6 +90,15 @@ impl StoreServer {
         Ok(CommandResponse {
             status: 0,
             message: res.to_string(),
+            pairs: vec![],
+        })
+    }
+
+    pub fn smembers(&self, smembers_req: SMembers) -> Result<CommandResponse, KvError> {
+        let res = self.server_inner.data_store.smembers(&smembers_req.key)?;
+        Ok(CommandResponse {
+            status: 0,
+            message: format!("{:?}", res),
             pairs: vec![],
         })
     }
