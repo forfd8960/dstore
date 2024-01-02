@@ -40,6 +40,15 @@ impl From<Vec<&str>> for pb::HSet {
     }
 }
 
+impl From<Vec<&str>> for pb::SAdd {
+    fn from(cmds: Vec<&str>) -> Self {
+        Self {
+            key: cmds[1].to_string(),
+            values: Vec::from_iter(cmds[2..].iter().map(|x| x.to_string())),
+        }
+    }
+}
+
 fn group_kv(cmds: &[&str]) -> Vec<pb::Kv> {
     if cmds.len() % 2 != 0 {
         return vec![];

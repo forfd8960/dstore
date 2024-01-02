@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use dashmap::DashMap;
 
@@ -10,6 +10,7 @@ use crate::pb::pb;
 pub struct MemTable {
     simple_k_v: DashMap<String, String>,
     data_map: DashMap<String, DashMap<String, String>>,
+    simple_set: DashMap<String, HashSet<String>>,
 }
 
 impl MemTable {
@@ -17,6 +18,7 @@ impl MemTable {
         Self {
             simple_k_v: DashMap::with_capacity(cap as usize),
             data_map: DashMap::with_capacity(cap as usize),
+            simple_set: DashMap::with_capacity(cap as usize),
         }
     }
 }
@@ -44,6 +46,22 @@ impl Storage for MemTable {
         }
     }
 
+    fn sadd(&self, key: &str, values: Vec<String>) -> Result<i64, KvError> {
+        let result = self.simple_set.get_mut(key);
+        let length = values.len();
+        match result {
+            Some(mut set) => {
+                for v in values {
+                    set.insert(v);
+                }
+            }
+            None => {
+                self.simple_set
+                    .insert(key.to_string(), HashSet::from_iter(values));
+            }
+        }
+        Ok(length as i64)
+    }
     fn hget(&self, key: &str, field: &str) -> Result<Option<pb::Kv>, KvError> {
         let result = self.data_map.get(key);
         match result {

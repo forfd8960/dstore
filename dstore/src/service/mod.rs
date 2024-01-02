@@ -1,8 +1,11 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{
+    collections::{HashMap, HashSet},
+    sync::Arc,
+};
 
 use crate::{
     errors::KvError,
-    pb::pb::{commond_request::RequestData, CommandResponse, Get, HGet, HSet, Set},
+    pb::pb::{commond_request::RequestData, CommandResponse, Get, HGet, HSet, SAdd, Set},
     storage::{MemTable, Storage},
 };
 
@@ -30,7 +33,7 @@ impl StoreServer {
             RequestData::Set(set_req) => self.set(set_req),
             RequestData::Hget(hget_req) => self.hget(hget_req),
             RequestData::Hset(hset_req) => self.hset(hset_req),
-            RequestData::Sadd(sadd_req) => todo!(),
+            RequestData::Sadd(sadd_req) => self.sadd(sadd_req),
             RequestData::Smembers(smembers_req) => todo!(),
         }
     }
@@ -72,6 +75,18 @@ impl StoreServer {
         }
 
         let res = self.server_inner.data_store.hset(&data.key, m)?;
+        Ok(CommandResponse {
+            status: 0,
+            message: res.to_string(),
+            pairs: vec![],
+        })
+    }
+
+    pub fn sadd(&self, sadd_req: SAdd) -> Result<CommandResponse, KvError> {
+        let res = self
+            .server_inner
+            .data_store
+            .sadd(&sadd_req.key, sadd_req.values)?;
         Ok(CommandResponse {
             status: 0,
             message: res.to_string(),

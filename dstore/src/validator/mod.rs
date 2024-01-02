@@ -58,3 +58,15 @@ impl CmdValidtor for pb::HSet {
         None
     }
 }
+
+impl CmdValidtor for pb::SAdd {
+    fn validate(cmds: Vec<&str>) -> Option<CmdError> {
+        if cmds.len() < 3 {
+            return Some(CmdError::InvalidHSetCmd(
+                "not enough parameter for SAdd".to_string(),
+            ));
+        }
+
+        None
+    }
+}
