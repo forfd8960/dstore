@@ -38,7 +38,14 @@ async fn send_cmd() -> Result<()> {
                         stream.read_buf(&mut resp).await.unwrap();
 
                         let cmd_resp = pb::CommandResponse::decode(&mut resp);
-                        println!("read response: {:?}", cmd_resp);
+                        match cmd_resp {
+                            Ok(v) => {
+                                println!("{}", v);
+                            }
+                            Err(e) => {
+                                println!("{}", e);
+                            }
+                        }
                     }
                     Err(e) => {
                         println!("parse cmd err: {}", e);

@@ -46,6 +46,7 @@ async fn main() -> Result<()> {
                                         status: 400,
                                         message: kv_error.to_string(),
                                         pairs: vec![],
+                                        values: vec![],
                                     };
                                     let _ =
                                         tcp_stream.write_all(resp.encode_to_vec().as_slice()).await;

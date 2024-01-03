@@ -81,6 +81,8 @@ pub struct CommandResponse {
     pub message: ::prost::alloc::string::String,
     #[prost(message, repeated, tag = "3")]
     pub pairs: ::prost::alloc::vec::Vec<Kv>,
+    #[prost(message, repeated, tag = "4")]
+    pub values: ::prost::alloc::vec::Vec<Value>,
 }
 #[derive(PartialOrd)]
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -90,6 +92,13 @@ pub struct Kv {
     pub key: ::prost::alloc::string::String,
     #[prost(string, tag = "2")]
     pub value: ::prost::alloc::string::String,
+}
+#[derive(PartialOrd)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Value {
+    #[prost(string, tag = "1")]
+    pub val: ::prost::alloc::string::String,
 }
 #[derive(PartialOrd)]
 #[allow(clippy::derive_partial_eq_without_eq)]

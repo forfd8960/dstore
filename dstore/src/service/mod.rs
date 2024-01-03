@@ -5,7 +5,9 @@ use std::{
 
 use crate::{
     errors::KvError,
-    pb::pb::{commond_request::RequestData, CommandResponse, Get, HGet, HSet, SAdd, SMembers, Set},
+    pb::pb::{
+        commond_request::RequestData, CommandResponse, Get, HGet, HSet, SAdd, SMembers, Set, Value,
+    },
     storage::{MemTable, Storage},
 };
 
@@ -44,6 +46,7 @@ impl StoreServer {
             status: 0,
             message: "OK".to_string(),
             pairs: vec![value],
+            values: vec![],
         })
     }
 
@@ -55,6 +58,7 @@ impl StoreServer {
             status: 0,
             message: "OK".to_string(),
             pairs: vec![res.unwrap()],
+            values: vec![],
         })
     }
 
@@ -64,6 +68,7 @@ impl StoreServer {
             status: 0,
             message: "OK".to_string(),
             pairs: vec![res.unwrap()],
+            values: vec![],
         })
     }
 
@@ -79,6 +84,7 @@ impl StoreServer {
             status: 0,
             message: res.to_string(),
             pairs: vec![],
+            values: vec![],
         })
     }
 
@@ -91,6 +97,7 @@ impl StoreServer {
             status: 0,
             message: res.to_string(),
             pairs: vec![],
+            values: vec![],
         })
     }
 
@@ -100,6 +107,7 @@ impl StoreServer {
             status: 0,
             message: format!("{:?}", res),
             pairs: vec![],
+            values: Vec::from_iter(res.iter().map(|x| Value { val: x.to_string() })),
         })
     }
 }
