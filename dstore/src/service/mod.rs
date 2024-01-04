@@ -37,6 +37,9 @@ impl StoreServer {
             RequestData::Hset(hset_req) => self.hset(hset_req),
             RequestData::Sadd(sadd_req) => self.sadd(sadd_req),
             RequestData::Smembers(smembers_req) => self.smembers(smembers_req),
+            RequestData::Lpush(lpush_req) => todo!(),
+            RequestData::Lpop(lpop_req) => todo!(),
+            RequestData::Lrange(lrange_req) => todo!(),
         }
     }
 

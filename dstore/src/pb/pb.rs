@@ -2,7 +2,7 @@
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CommondRequest {
-    #[prost(oneof = "commond_request::RequestData", tags = "1, 2, 3, 4, 5, 6")]
+    #[prost(oneof = "commond_request::RequestData", tags = "1, 2, 3, 4, 5, 6, 7, 8, 9")]
     pub request_data: ::core::option::Option<commond_request::RequestData>,
 }
 /// Nested message and enum types in `CommondRequest`.
@@ -23,6 +23,12 @@ pub mod commond_request {
         Sadd(super::SAdd),
         #[prost(message, tag = "6")]
         Smembers(super::SMembers),
+        #[prost(message, tag = "7")]
+        Lpush(super::LPush),
+        #[prost(message, tag = "8")]
+        Lpop(super::LPop),
+        #[prost(message, tag = "9")]
+        Lrange(super::LRange),
     }
 }
 #[derive(PartialOrd)]
@@ -108,4 +114,33 @@ pub struct HMap {
     pub key: ::prost::alloc::string::String,
     #[prost(message, repeated, tag = "2")]
     pub field_values: ::prost::alloc::vec::Vec<Kv>,
+}
+#[derive(PartialOrd)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LPush {
+    #[prost(string, tag = "1")]
+    pub key: ::prost::alloc::string::String,
+    #[prost(string, repeated, tag = "2")]
+    pub elements: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+}
+#[derive(PartialOrd)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LPop {
+    #[prost(string, tag = "1")]
+    pub key: ::prost::alloc::string::String,
+    #[prost(int64, tag = "2")]
+    pub count: i64,
+}
+#[derive(PartialOrd)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LRange {
+    #[prost(string, tag = "1")]
+    pub key: ::prost::alloc::string::String,
+    #[prost(int64, tag = "2")]
+    pub start: i64,
+    #[prost(int64, tag = "3")]
+    pub stop: i64,
 }

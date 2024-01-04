@@ -10,6 +10,9 @@ message CommondRequest {
     HSet hset = 4;
     SAdd sadd = 5;
     SMembers smembers = 6;
+    LPush lpush = 7;
+    LPop lpop = 8;
+    LRange lrange = 9;
   }
 }
 
@@ -47,4 +50,20 @@ message Value { string val = 1; }
 message HMap {
   string key = 1;
   repeated KV field_values = 2;
+}
+
+message LPush {
+  string key = 1;
+  repeated string elements = 2;
+}
+
+message LPop {
+  string key = 1;
+  int64 count = 2;
+}
+
+message LRange {
+  string key = 1;
+  int64 start = 2;
+  int64 stop = 3;
 }
