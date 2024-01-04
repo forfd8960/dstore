@@ -11,6 +11,7 @@ pub struct MemTable {
     simple_k_v: DashMap<String, String>,
     data_map: DashMap<String, DashMap<String, String>>,
     simple_set: DashMap<String, HashSet<String>>,
+    list: DashMap<String, Vec<String>>,
 }
 
 impl MemTable {
@@ -19,6 +20,7 @@ impl MemTable {
             simple_k_v: DashMap::with_capacity(cap as usize),
             data_map: DashMap::with_capacity(cap as usize),
             simple_set: DashMap::with_capacity(cap as usize),
+            list: DashMap::with_capacity(cap as usize),
         }
     }
 }
@@ -115,5 +117,46 @@ impl Storage for MemTable {
         let len = d.len();
         self.data_map.insert(key.to_string(), d);
         Ok(len as i64)
+    }
+
+    fn lpush(&self, key: &str, elements: Vec<String>) -> Result<i64, KvError> {
+        let result = self.list.get_mut(key);
+        match result {
+            Some(mut l) => {
+                for e in elements {
+                    l.insert(0, e);
+                }
+                Ok(l.len() as i64)
+            }
+            None => {
+                self.list.insert(key.to_string(), elements.clone());
+                Ok(elements.len() as i64)
+            }
+        }
+    }
+
+    fn lpop(&self, key: &str, count: i64) -> Result<Vec<String>, KvError> {
+        let result = self.list.get_mut(key);
+        match result {
+            Some(mut l) => {
+                if count <= 1 {
+                    let u = l.drain(..1);
+                    return Ok(u.collect());
+                }
+
+                if count as usize >= l.len() {
+                    let u = l.drain(..);
+                    return Ok(u.collect());
+                }
+
+                let u = l.drain(..count as usize);
+                return Ok(u.collect());
+            }
+            None => Ok(vec![]),
+        }
+    }
+
+    fn lrange(&self, key: &str, start: i64, stop: i64) -> Result<Vec<String>, KvError> {
+        Ok(vec![])
     }
 }

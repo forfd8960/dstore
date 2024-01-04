@@ -57,6 +57,24 @@ impl From<Vec<&str>> for pb::SMembers {
     }
 }
 
+impl From<Vec<&str>> for pb::LPush {
+    fn from(cmds: Vec<&str>) -> Self {
+        Self {
+            key: cmds[1].to_string(),
+            elements: Vec::from_iter(cmds[2..].iter().map(|x| x.to_string())),
+        }
+    }
+}
+
+impl From<Vec<&str>> for pb::LPop {
+    fn from(cmds: Vec<&str>) -> Self {
+        Self {
+            key: cmds[1].to_string(),
+            count: cmds[2].parse().unwrap(),
+        }
+    }
+}
+
 fn group_kv(cmds: &[&str]) -> Vec<pb::Kv> {
     if cmds.len() % 2 != 0 {
         return vec![];

@@ -13,4 +13,7 @@ pub trait Storage {
     fn hset(&self, key: &str, m: HashMap<String, String>) -> Result<i64, KvError>;
     fn sadd(&self, key: &str, values: Vec<String>) -> Result<i64, KvError>;
     fn smembers(&self, key: &str) -> Result<Vec<String>, KvError>;
+    fn lpush(&self, key: &str, elements: Vec<String>) -> Result<i64, KvError>;
+    fn lpop(&self, key: &str, count: i64) -> Result<Vec<String>, KvError>;
+    fn lrange(&self, key: &str, start: i64, stop: i64) -> Result<Vec<String>, KvError>;
 }

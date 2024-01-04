@@ -1,10 +1,7 @@
 use anyhow::Result;
 use bytes::BytesMut;
-use dstore::{
-    errors::CmdError,
-    pb::{pb, GET_CMD, HGET_CMD, HSET_CMD, SADD_CMD, SET_CMD, SMEMBERS_CMD},
-    validator::CmdValidtor,
-};
+use dstore::pb as storepb;
+use dstore::{errors::CmdError, pb::pb, validator::CmdValidtor};
 use prost::Message;
 use std::io::Write;
 use tokio::{
@@ -66,7 +63,7 @@ fn parse_cmd(cmd: String) -> Result<pb::CommondRequest, CmdError> {
     }
 
     match args[0] {
-        GET_CMD => {
+        storepb::GET_CMD => {
             let res = pb::Get::validate(args.clone());
             if res.is_some() {
                 return Err(res.unwrap());
@@ -76,7 +73,7 @@ fn parse_cmd(cmd: String) -> Result<pb::CommondRequest, CmdError> {
                 request_data: Some(pb::commond_request::RequestData::Get(pb::Get::from(args))),
             })
         }
-        SET_CMD => {
+        storepb::SET_CMD => {
             let res = pb::Set::validate(args.clone());
             if res.is_some() {
                 return Err(res.unwrap());
@@ -86,7 +83,7 @@ fn parse_cmd(cmd: String) -> Result<pb::CommondRequest, CmdError> {
                 request_data: Some(pb::commond_request::RequestData::Set(pb::Set::from(args))),
             })
         }
-        HGET_CMD => {
+        storepb::HGET_CMD => {
             let res = pb::HGet::validate(args.clone());
             if res.is_some() {
                 return Err(res.unwrap());
@@ -96,7 +93,7 @@ fn parse_cmd(cmd: String) -> Result<pb::CommondRequest, CmdError> {
                 request_data: Some(pb::commond_request::RequestData::Hget(pb::HGet::from(args))),
             })
         }
-        HSET_CMD => {
+        storepb::HSET_CMD => {
             let res = pb::HSet::validate(args.clone());
             if res.is_some() {
                 return Err(res.unwrap());
@@ -106,7 +103,7 @@ fn parse_cmd(cmd: String) -> Result<pb::CommondRequest, CmdError> {
                 request_data: Some(pb::commond_request::RequestData::Hset(pb::HSet::from(args))),
             })
         }
-        SADD_CMD => {
+        storepb::SADD_CMD => {
             let res = pb::SAdd::validate(args.clone());
             if res.is_some() {
                 return Err(res.unwrap());
@@ -116,7 +113,7 @@ fn parse_cmd(cmd: String) -> Result<pb::CommondRequest, CmdError> {
                 request_data: Some(pb::commond_request::RequestData::Sadd(pb::SAdd::from(args))),
             })
         }
-        SMEMBERS_CMD => {
+        storepb::SMEMBERS_CMD => {
             let res = pb::SMembers::validate(args.clone());
             if res.is_some() {
                 return Err(res.unwrap());
@@ -128,6 +125,15 @@ fn parse_cmd(cmd: String) -> Result<pb::CommondRequest, CmdError> {
                 )),
             })
         }
+
+        storepb::LPUSH => Ok(pb::CommondRequest {
+            request_data: Some(pb::commond_request::RequestData::Lpush(pb::LPush::from(
+                args,
+            ))),
+        }),
+        storepb::LPOP => Ok(pb::CommondRequest {
+            request_data: Some(pb::commond_request::RequestData::Lpop(pb::LPop::from(args))),
+        }),
         _ => Err(CmdError::UnknownCmd(args[0].to_string())),
     }
 }

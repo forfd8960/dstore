@@ -1,12 +1,10 @@
-use std::{
-    collections::{HashMap, HashSet},
-    sync::Arc,
-};
+use std::{collections::HashMap, sync::Arc};
 
 use crate::{
     errors::KvError,
     pb::pb::{
-        commond_request::RequestData, CommandResponse, Get, HGet, HSet, SAdd, SMembers, Set, Value,
+        commond_request::RequestData, CommandResponse, Get, HGet, HSet, LPop, LPush, SAdd,
+        SMembers, Set, Value,
     },
     storage::{MemTable, Storage},
 };
@@ -37,8 +35,8 @@ impl StoreServer {
             RequestData::Hset(hset_req) => self.hset(hset_req),
             RequestData::Sadd(sadd_req) => self.sadd(sadd_req),
             RequestData::Smembers(smembers_req) => self.smembers(smembers_req),
-            RequestData::Lpush(lpush_req) => todo!(),
-            RequestData::Lpop(lpop_req) => todo!(),
+            RequestData::Lpush(lpush_req) => self.lpush(lpush_req),
+            RequestData::Lpop(lpop_req) => self.lpop(lpop_req),
             RequestData::Lrange(lrange_req) => todo!(),
         }
     }
@@ -109,6 +107,32 @@ impl StoreServer {
         Ok(CommandResponse {
             status: 0,
             message: format!("{:?}", res),
+            pairs: vec![],
+            values: Vec::from_iter(res.iter().map(|x| Value { val: x.to_string() })),
+        })
+    }
+
+    pub fn lpush(&self, lpush_req: LPush) -> Result<CommandResponse, KvError> {
+        let res = self
+            .server_inner
+            .data_store
+            .lpush(&lpush_req.key, lpush_req.elements)?;
+        Ok(CommandResponse {
+            status: 0,
+            message: format!("{:?}", res),
+            pairs: vec![],
+            values: vec![],
+        })
+    }
+
+    pub fn lpop(&self, lpop_req: LPop) -> Result<CommandResponse, KvError> {
+        let res = self
+            .server_inner
+            .data_store
+            .lpop(&lpop_req.key, lpop_req.count)?;
+        Ok(CommandResponse {
+            status: 0,
+            message: "".to_string(),
             pairs: vec![],
             values: Vec::from_iter(res.iter().map(|x| Value { val: x.to_string() })),
         })

@@ -6,6 +6,8 @@ pub const HGET_CMD: &str = "HGet";
 pub const HSET_CMD: &str = "HSet";
 pub const SADD_CMD: &str = "SAdd";
 pub const SMEMBERS_CMD: &str = "SMembers";
+pub const LPUSH: &str = "LPush";
+pub const LPOP: &str = "LPop";
 
 impl std::fmt::Display for pb::CommandResponse {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
