@@ -157,6 +157,77 @@ impl Storage for MemTable {
     }
 
     fn lrange(&self, key: &str, start: i64, stop: i64) -> Result<Vec<String>, KvError> {
-        Ok(vec![])
+        let result = self.list.get(key);
+        match result {
+            Some(l) => {
+                let start1 = start as usize;
+                if start1 > l.len() {
+                    return Ok(vec![]);
+                }
+
+                let mut end = (stop + 1) as usize;
+                if end > l.len() {
+                    end = l.len();
+                }
+
+                if start1 > end {
+                    return Ok(vec![]);
+                }
+
+                Ok(Vec::from_iter(l[start1..end].iter().map(|x| x.to_string())))
+            }
+            None => Ok(vec![]),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::MemTable;
+    use crate::storage::Storage;
+
+    #[test]
+    fn test_lpush() {
+        let mem_table = MemTable::new(1000);
+        let res = mem_table.lpush("test1", vec!["data1".to_string(), "data2".to_string()]);
+        assert_eq!(true, res.is_ok());
+        assert_eq!(2 as i64, res.unwrap());
+
+        let data = mem_table.lpop("test1", 1);
+        assert_eq!(true, data.is_ok());
+        assert_eq!(vec!["data1".to_string()], data.unwrap());
+    }
+
+    #[test]
+    fn test_lrange() {
+        let mem_table = MemTable::new(1000);
+        let res = mem_table.lpush(
+            "test1",
+            vec!["a".to_string(), "b".to_string(), "c".to_string()],
+        );
+        assert_eq!(true, res.is_ok());
+        assert_eq!(3 as i64, res.unwrap());
+
+        let data = mem_table.lrange("test1", 0, 0);
+        assert_eq!(true, data.is_ok());
+        assert_eq!(vec!["a".to_string()], data.unwrap());
+
+        let data1 = mem_table.lrange("test1", 0, 6);
+        assert_eq!(true, data1.is_ok());
+        assert_eq!(
+            vec!["a".to_string(), "b".to_string(), "c".to_string()],
+            data1.unwrap()
+        );
+
+        let data2 = mem_table.lrange("test1", 0, 1);
+        assert_eq!(true, data2.is_ok());
+        assert_eq!(vec!["a".to_string(), "b".to_string()], data2.unwrap());
+
+        let data3 = mem_table.lrange("test1", 0, 2);
+        assert_eq!(true, data3.is_ok());
+        assert_eq!(
+            vec!["a".to_string(), "b".to_string(), "c".to_string()],
+            data3.unwrap()
+        );
     }
 }

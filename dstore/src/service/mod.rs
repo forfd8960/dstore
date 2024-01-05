@@ -3,7 +3,7 @@ use std::{collections::HashMap, sync::Arc};
 use crate::{
     errors::KvError,
     pb::pb::{
-        commond_request::RequestData, CommandResponse, Get, HGet, HSet, LPop, LPush, SAdd,
+        commond_request::RequestData, CommandResponse, Get, HGet, HSet, LPop, LPush, LRange, SAdd,
         SMembers, Set, Value,
     },
     storage::{MemTable, Storage},
@@ -37,7 +37,7 @@ impl StoreServer {
             RequestData::Smembers(smembers_req) => self.smembers(smembers_req),
             RequestData::Lpush(lpush_req) => self.lpush(lpush_req),
             RequestData::Lpop(lpop_req) => self.lpop(lpop_req),
-            RequestData::Lrange(lrange_req) => todo!(),
+            RequestData::Lrange(lrange_req) => self.lrange(lrange_req),
         }
     }
 
@@ -130,6 +130,20 @@ impl StoreServer {
             .server_inner
             .data_store
             .lpop(&lpop_req.key, lpop_req.count)?;
+        Ok(CommandResponse {
+            status: 0,
+            message: "".to_string(),
+            pairs: vec![],
+            values: Vec::from_iter(res.iter().map(|x| Value { val: x.to_string() })),
+        })
+    }
+
+    pub fn lrange(&self, lrange_req: LRange) -> Result<CommandResponse, KvError> {
+        let res = self.server_inner.data_store.lrange(
+            &lrange_req.key,
+            lrange_req.start,
+            lrange_req.stop,
+        )?;
         Ok(CommandResponse {
             status: 0,
             message: "".to_string(),

@@ -134,6 +134,11 @@ fn parse_cmd(cmd: String) -> Result<pb::CommondRequest, CmdError> {
         storepb::LPOP => Ok(pb::CommondRequest {
             request_data: Some(pb::commond_request::RequestData::Lpop(pb::LPop::from(args))),
         }),
+        storepb::LRange => Ok(pb::CommondRequest {
+            request_data: Some(pb::commond_request::RequestData::Lrange(pb::LRange::from(
+                args,
+            ))),
+        }),
         _ => Err(CmdError::UnknownCmd(args[0].to_string())),
     }
 }
