@@ -10,9 +10,10 @@ message CommondRequest {
     HSet hset = 4;
     SAdd sadd = 5;
     SMembers smembers = 6;
-    LPush lpush = 7;
-    LPop lpop = 8;
-    LRange lrange = 9;
+    SCARD scard = 7;
+    LPush lpush = 8;
+    LPop lpop = 9;
+    LRange lrange = 10;
   }
 }
 
@@ -32,6 +33,8 @@ message SAdd {
 }
 
 message SMembers { string key = 1; }
+
+message SCARD { string key = 1; }
 
 message CommandResponse {
   uint32 status = 1;

@@ -2,7 +2,10 @@
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CommondRequest {
-    #[prost(oneof = "commond_request::RequestData", tags = "1, 2, 3, 4, 5, 6, 7, 8, 9")]
+    #[prost(
+        oneof = "commond_request::RequestData",
+        tags = "1, 2, 3, 4, 5, 6, 7, 8, 9, 10"
+    )]
     pub request_data: ::core::option::Option<commond_request::RequestData>,
 }
 /// Nested message and enum types in `CommondRequest`.
@@ -24,10 +27,12 @@ pub mod commond_request {
         #[prost(message, tag = "6")]
         Smembers(super::SMembers),
         #[prost(message, tag = "7")]
-        Lpush(super::LPush),
+        Scard(super::Scard),
         #[prost(message, tag = "8")]
-        Lpop(super::LPop),
+        Lpush(super::LPush),
         #[prost(message, tag = "9")]
+        Lpop(super::LPop),
+        #[prost(message, tag = "10")]
         Lrange(super::LRange),
     }
 }
@@ -74,6 +79,13 @@ pub struct SAdd {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SMembers {
+    #[prost(string, tag = "1")]
+    pub key: ::prost::alloc::string::String,
+}
+#[derive(PartialOrd)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Scard {
     #[prost(string, tag = "1")]
     pub key: ::prost::alloc::string::String,
 }

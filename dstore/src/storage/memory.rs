@@ -92,6 +92,15 @@ impl Storage for MemTable {
 
         Ok(members)
     }
+
+    fn scard(&self, key: &str) -> Result<i64, KvError> {
+        let result = self.simple_set.get(key);
+        match result {
+            Some(set) => Ok(set.len() as i64),
+            None => Ok(0),
+        }
+    }
+
     fn hget(&self, key: &str, field: &str) -> Result<Option<pb::Kv>, KvError> {
         let result = self.data_map.get(key);
         match result {

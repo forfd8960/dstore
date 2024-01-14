@@ -11,6 +11,8 @@ pub const HGET_CMD: &str = "HGet";
 pub const HSET_CMD: &str = "HSet";
 pub const SADD_CMD: &str = "SAdd";
 pub const SMEMBERS_CMD: &str = "SMembers";
+pub const SCARD: &str = "SCard";
+
 pub const LPUSH: &str = "LPush";
 pub const LPOP: &str = "LPop";
 pub const LRANGE: &str = "LRange";
@@ -47,6 +49,7 @@ pub fn validate(cmd: &str, args: Vec<&str>) -> Option<CmdError> {
         HSET_CMD => dspb::HSet::validate(args),
         SADD_CMD => dspb::SAdd::validate(args),
         SMEMBERS_CMD => dspb::SMembers::validate(args),
+        SCARD => dspb::Scard::validate(args),
         LPUSH => dspb::LPush::validate(args),
         LPOP => dspb::LPop::validate(args),
         LRANGE => dspb::LRange::validate(args),
@@ -62,6 +65,7 @@ pub fn build_cmd_request(cmd: &str, args: Vec<&str>) -> Option<dspb::CommondRequ
         HSET_CMD => dspb::HSet::build(args),
         SADD_CMD => dspb::SAdd::build(args),
         SMEMBERS_CMD => dspb::SMembers::build(args),
+        SCARD => dspb::Scard::build(args),
         LPUSH => dspb::LPush::build(args),
         LPOP => dspb::LPop::build(args),
         LRANGE => dspb::LRange::build(args),
@@ -104,6 +108,16 @@ impl CmdRequestBuild for dspb::SMembers {
         Some(dspb::CommondRequest {
             request_data: Some(dspb::commond_request::RequestData::Smembers(
                 dspb::SMembers::from(cmds),
+            )),
+        })
+    }
+}
+
+impl CmdRequestBuild for dspb::Scard {
+    fn build(cmds: Vec<&str>) -> Option<dspb::CommondRequest> {
+        Some(dspb::CommondRequest {
+            request_data: Some(dspb::commond_request::RequestData::Scard(
+                dspb::Scard::from(cmds),
             )),
         })
     }

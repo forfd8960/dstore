@@ -57,6 +57,14 @@ impl From<Vec<&str>> for pb::SMembers {
     }
 }
 
+impl From<Vec<&str>> for pb::Scard {
+    fn from(cmds: Vec<&str>) -> Self {
+        Self {
+            key: cmds[1].to_string(),
+        }
+    }
+}
+
 impl From<Vec<&str>> for pb::LPush {
     fn from(cmds: Vec<&str>) -> Self {
         Self {

@@ -4,7 +4,7 @@ use crate::{
     errors::KvError,
     pb::pb::{
         commond_request::RequestData, CommandResponse, Get, HGet, HSet, LPop, LPush, LRange, SAdd,
-        SMembers, Set, Value,
+        SMembers, Scard, Set, Value,
     },
     storage::{MemTable, Storage},
 };
@@ -38,6 +38,7 @@ impl StoreServer {
             RequestData::Lpush(lpush_req) => self.lpush(lpush_req),
             RequestData::Lpop(lpop_req) => self.lpop(lpop_req),
             RequestData::Lrange(lrange_req) => self.lrange(lrange_req),
+            RequestData::Scard(scard_req) => self.scard(scard_req),
         }
     }
 
@@ -109,6 +110,18 @@ impl StoreServer {
             message: format!("{:?}", res),
             pairs: vec![],
             values: Vec::from_iter(res.iter().map(|x| Value { val: x.to_string() })),
+        })
+    }
+
+    pub fn scard(&self, smembers_req: Scard) -> Result<CommandResponse, KvError> {
+        let res = self.server_inner.data_store.scard(&smembers_req.key)?;
+        Ok(CommandResponse {
+            status: 0,
+            message: format!("{:?}", res),
+            pairs: vec![],
+            values: vec![Value {
+                val: res.to_string(),
+            }],
         })
     }
 

@@ -83,6 +83,24 @@ impl CmdValidtor for pb::SMembers {
     }
 }
 
+impl CmdValidtor for pb::Scard {
+    fn validate(cmds: Vec<&str>) -> Option<CmdError> {
+        if cmds.len() != 2 {
+            return Some(CmdError::InvalidCmdParameter(
+                "not enough parameter for SCARD".to_string(),
+            ));
+        }
+
+        if cmds[1] == "" {
+            return Some(CmdError::InvalidCmdParameter(
+                "invalid key for SCARD".to_string(),
+            ));
+        }
+
+        None
+    }
+}
+
 impl CmdValidtor for pb::LPush {
     fn validate(cmds: Vec<&str>) -> Option<CmdError> {
         if cmds.len() < 2 {
@@ -109,7 +127,7 @@ impl CmdValidtor for pb::LPop {
 
 impl CmdValidtor for pb::LRange {
     fn validate(cmds: Vec<&str>) -> Option<CmdError> {
-        if cmds.len() != 3 {
+        if cmds.len() != 4 {
             return Some(CmdError::InvalidCmdParameter(
                 "not enough parameter for LRange".to_string(),
             ));

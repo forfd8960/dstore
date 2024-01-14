@@ -62,10 +62,10 @@ fn parse_cmd(cmd: String) -> Result<pb::CommondRequest, CmdError> {
         return Err(CmdError::InvalidCmdParameter(cmd));
     }
 
-    let valid_err = storepb::validate(cmd.as_str(), args.clone());
+    let valid_err = storepb::validate(args[0], args.clone());
     match valid_err {
         Some(e) => Err(e),
-        None => match storepb::build_cmd_request(cmd.as_str(), args) {
+        None => match storepb::build_cmd_request(args[0], args) {
             Some(req) => Ok(req),
             None => Err(CmdError::UnknownCmd(cmd)),
         },
