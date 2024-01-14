@@ -1,10 +1,13 @@
 use anyhow::Result;
 use bytes::Bytes;
 use prost::Message;
-use tokio::{io::AsyncWriteExt, net::TcpListener};
+use tokio::{
+    io::AsyncWriteExt,
+    net::{TcpListener, TcpStream},
+};
 
 use dstore::{
-    pb::pb::{self as dspb, CommandResponse},
+    pb::pb::{self as dspb, CommandResponse, CommondRequest},
     service::StoreServer,
 };
 
@@ -34,24 +37,7 @@ async fn main() -> Result<()> {
                     match req_data {
                         Ok(req) => {
                             println!("decode cmd: {:?}", req);
-
-                            let resp = server_clone.dispatch(req.request_data.unwrap());
-                            match resp {
-                                Ok(res) => {
-                                    let res_bs = res.encode_to_vec();
-                                    let _ = tcp_stream.write_all(res_bs.as_slice()).await;
-                                }
-                                Err(kv_error) => {
-                                    let resp = CommandResponse {
-                                        status: 400,
-                                        message: kv_error.to_string(),
-                                        pairs: vec![],
-                                        values: vec![],
-                                    };
-                                    let _ =
-                                        tcp_stream.write_all(resp.encode_to_vec().as_slice()).await;
-                                }
-                            }
+                            handle_cmd(&mut tcp_stream, server_clone, req).await;
                         }
                         Err(e) => {
                             println!("failed to decode request: {}", e);
@@ -63,5 +49,24 @@ async fn main() -> Result<()> {
                 }
             }
         });
+    }
+}
+
+async fn handle_cmd(tcp_stream: &mut TcpStream, server_clone: StoreServer, req: CommondRequest) {
+    let resp = server_clone.dispatch(req.request_data.unwrap());
+    match resp {
+        Ok(res) => {
+            let res_bs = res.encode_to_vec();
+            let _ = tcp_stream.write_all(res_bs.as_slice()).await;
+        }
+        Err(kv_error) => {
+            let resp = CommandResponse {
+                status: 400,
+                message: kv_error.to_string(),
+                pairs: vec![],
+                values: vec![],
+            };
+            let _ = tcp_stream.write_all(resp.encode_to_vec().as_slice()).await;
+        }
     }
 }
