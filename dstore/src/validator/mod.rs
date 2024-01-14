@@ -82,3 +82,39 @@ impl CmdValidtor for pb::SMembers {
         None
     }
 }
+
+impl CmdValidtor for pb::LPush {
+    fn validate(cmds: Vec<&str>) -> Option<CmdError> {
+        if cmds.len() < 2 {
+            return Some(CmdError::InvalidCmdParameter(
+                "not enough parameter for LPush".to_string(),
+            ));
+        }
+
+        None
+    }
+}
+
+impl CmdValidtor for pb::LPop {
+    fn validate(cmds: Vec<&str>) -> Option<CmdError> {
+        if cmds.len() != 2 {
+            return Some(CmdError::InvalidCmdParameter(
+                "not enough parameter for LPop".to_string(),
+            ));
+        }
+
+        None
+    }
+}
+
+impl CmdValidtor for pb::LRange {
+    fn validate(cmds: Vec<&str>) -> Option<CmdError> {
+        if cmds.len() != 3 {
+            return Some(CmdError::InvalidCmdParameter(
+                "not enough parameter for LRange".to_string(),
+            ));
+        }
+
+        None
+    }
+}
